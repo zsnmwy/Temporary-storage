@@ -6,4 +6,4 @@ Get_steamcommunity_ip(){
 	sed -i -e 's#'"$(echo ${get_ip})"'#'"$(echo $(Get_steamcommunity_ip))"'#' /etc/hosts
 	echo "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 已经更新steamcommunity-hosts" >> /tmp/steamcommunity-hosts.log
 	hosts=$(cat /etc/hosts | grep steamcommunity.com)
-	echo -e "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 当前的steamcommunicty host 是 \n ${hosts} \n\n" >> /tmp/steamcommunity-hosts.log
+	echo -e "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 当前的steamcommunicty host 是  ${hosts} \n\n" >> /tmp/steamcommunity-hosts.log
