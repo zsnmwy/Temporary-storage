@@ -569,17 +569,13 @@ Manage_ArchiSteamFarm_log() {
 	pm2 logs ArchiSteamFarm
 }
 
-ArchiSteamFarm_get_pm2id() {
-	ArchiSteamFarm_get_id_pm2=$(pm2 id ArchiSteamFarm | cut -d " " -f2)
-}
 
 menu_status_ArchiSteamFarm() {
 	if [[ -e ${ArchiSteamFarm_files} ]]; then
-		ArchiSteamFarm_get_pm2id
+		ArchiSteamFarm_get_id_pm2=$(pm2 ls | grep ArchiSteamFarm)
 		if [[ -n ${ArchiSteamFarm_get_id_pm2} ]]; then
 			ArchiSteamFarm_status=$(pm2 show ArchiSteamFarm | grep status | awk -F ' ' '{print $4}')
-			echo "${ArchiSteamFarm_status}"
-			if [[ "$ArchiSteamFarm_status" == "online" ]]; then
+			if [[ ${ArchiSteamFarm_status} == "online" ]]; then
 				echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}已启动${Font_color_suffix} (已经由PM2管理)"
 			elif [[ "$ArchiSteamFarm_status" == "stopped" ]]; then
 				echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}未启动${Font_color_suffix} (已经由PM2管理)"
@@ -587,7 +583,7 @@ menu_status_ArchiSteamFarm() {
 				echo -e " ${Red_font_prefix}错误${Font_color_suffix} ArchiSteamFarm出错 \n 请重载ArchiSteamFarm \n 或在管理移除ArchiSteamFarm后再次加入 \n 实在不行就去提issue"
 			fi
 		else
-			echo -e "${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}未加入PM2管理${Font_color_suffix}"
+			echo -e "${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}已安装${Font_color_suffix} 但 ${Red_font_prefix}未加入PM2管理${Font_color_suffix}"
 		fi
 	else
 		echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}未安装${Font_color_suffix}"
@@ -670,10 +666,10 @@ Manage_ArchiSteamFarm_Panel() {
 
 echo -e "
 1.安装
-2.管理
-"
+2.管理"
 menu_status_ArchiSteamFarm
-read aNumber
+echo "你的选择是(数字):" && read aNumber
+
 case $aNumber in
 1)
 	General_install
