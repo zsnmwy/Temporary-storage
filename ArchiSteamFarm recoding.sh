@@ -69,6 +69,8 @@ Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_p
 Info="${Green}[信息]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
+Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
+
 source /etc/os-release
 VERSION=$(echo ${VERSION} | awk -F "[()]" '{print $2}')
 bit=$(uname -m)
@@ -90,8 +92,8 @@ Qcloud_source() {
 
 Github_hosts() {
 	echo -e "是否重定向GitHub服务器？[Y/n]"
-	stty erase '^H' && read -p "(默认:Y):" github_re_direct_yn
-	[[ -z "${github_re_direct_yn}" ]] && github_re_direct_yn="Y"
+	stty erase '^H' && read -p "(默认:N):" github_re_direct_yn
+	[[ -z "${github_re_direct_yn}" ]] && github_re_direct_yn="n"
 	if [[ "${github_re_direct_yn}" == [Yy] ]]; then
 		cat >>/etc/hosts <<EOF
 219.76.4.4 github-cloud.s3.amazonaws.com
@@ -105,7 +107,7 @@ Check_system_bit() {
 	if [[ ${bit} == 'x86_64' ]]; then
 		echo -e "${OK} ${GreenBG} 符合脚本的系统位数要求 64位 ${Font}"
 	elif [[ ${bit} == 'armv7l' ]]; then
-		echo -e "${Info} ${GreenBG} 检测处理器为32位 可能是PI不更新系统导致的  请确保处理器为64位${Font}"
+		echo -e "${Info} ${GreenBG} 检测处理器为32位 可能是官方不更新系统导致的  请确保处理器为64位${Font}"
 	elif [[ ${bit} == 'armv8' ]]; then
 		echo -e "${OK} ${GreenBG} 符合脚本的系统位数要求 64位 ${Font}"
 	else
@@ -130,7 +132,7 @@ Check_system_Install_NetCore() {
 		rpm --import https://packages.microsoft.com/keys/microsoft.asc
 		sh -c 'echo -e "[packages-microsoft-com-prod]\nname=packages-microsoft-com-prod \nbaseurl=https://packages.microsoft.com/yumrepos/microsoft-rhel7.3-prod\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/dotnetdev.repo'
 		yum update -y
-		yum install -y unzip curl libunwind libicu wget unzip
+		yum install -y unzip curl libunwind libicu wget unzip screen
 		yum install -y dotnet-sdk-2.0.0
 		export PATH=$PATH:$HOME/dotnet
 		dotnet --version
@@ -146,7 +148,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install -y curl libunwind8 gettext apt-transport-https wget unzip
+		apt-get install -y curl libunwind8 gettext apt-transport-https wget unzip screen
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-jessie-prod jessie main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -166,7 +168,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install -y curl libunwind8 gettext apt-transport-https wget unzip
+		apt-get install -y curl libunwind8 gettext apt-transport-https wget unzip screen
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -185,7 +187,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install curl wget unzip
+		apt-get install curl wget unzip screen
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-artful-prod artful main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -204,7 +206,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install curl wget unzip
+		apt-get install curl wget unzip screen
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-zesty-prod zesty main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -222,7 +224,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install curl wget unzip
+		apt-get install curl wget unzip screen
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -241,7 +243,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install curl wget unzip
+		apt-get install curl wget unzip screen
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-trusty-prod trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -514,6 +516,8 @@ EOF
 Add_start_script_pm2_bash() {
 	mkdir -p /opt/Manage_ArchiSteamFarm
 	touch /opt/Manage_ArchiSteamFarm/ArchiSteamFarm.sh
+	cd /opt/Manage_ArchiSteamFarm
+	chmod 777 ArchiSteamFarm.sh
 	cat >/opt/Manage_ArchiSteamFarm/ArchiSteamFarm.sh <<EOF
 #!/usr/bin/env bash
 PATH=/opt/ArchiSteamFarm:/usr/bin
@@ -544,6 +548,11 @@ Manage_ArchiSteamFarm_start() {
 	pm2 start ArchiSteamFarm.sh
 }
 
+Manage_ArchiSteamFarm_start_ls() {
+	pm2 start ArchiSteamFarm.sh
+	pm2 ls
+}
+
 Manage_ArchiSteamFarm_stop() {
 	pm2 stop ArchiSteamFarm
 }
@@ -553,11 +562,36 @@ Manage_ArchiSteamFarm_delete() {
 }
 
 Manage_ArchiSteamFarm_screen_start() {
-	screen
+	screen -U -S bash ArchiSteamFarm.sh
 }
 
 Manage_ArchiSteamFarm_log() {
 	pm2 logs ArchiSteamFarm
+}
+
+ArchiSteamFarm_get_pm2id() {
+	ArchiSteamFarm_get_id_pm2=$(pm2 id ArchiSteamFarm | cut -d " " -f2)
+}
+
+menu_status_ArchiSteamFarm() {
+	if [[ -e ${ArchiSteamFarm_files} ]]; then
+		ArchiSteamFarm_get_pm2id
+		if [[ -n ${ArchiSteamFarm_get_id_pm2} ]]; then
+			ArchiSteamFarm_status=$(pm2 show ArchiSteamFarm | grep status | awk -F ' ' '{print $4}')
+			echo "${ArchiSteamFarm_status}"
+			if [[ "$ArchiSteamFarm_status" == "online" ]]; then
+				echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}已启动${Font_color_suffix} (已经由PM2管理)"
+			elif [[ "$ArchiSteamFarm_status" == "stopped" ]]; then
+				echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}已安装${Font_color_suffix} 并 ${Green_font_prefix}未启动${Font_color_suffix} (已经由PM2管理)"
+			elif [[ "$ArchiSteamFarm_status" == "errored" ]]; then
+				echo -e " ${Red_font_prefix}错误${Font_color_suffix} ArchiSteamFarm出错 \n 请重载ArchiSteamFarm \n 或在管理移除ArchiSteamFarm后再次加入 \n 实在不行就去提issue"
+			fi
+		else
+			echo -e "${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}未加入PM2管理${Font_color_suffix}"
+		fi
+	else
+		echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}未安装${Font_color_suffix}"
+	fi
 }
 
 Source_bash() {
@@ -590,7 +624,7 @@ General_install() {
 	ArchiSteamFarm_Install
 	Bot_Add
 	ArchiSteamFarm_json_English_change_to_zh-CN
-	Add_start_pm2_yaml
+	#Add_start_pm2_yaml
 	Add_start_script_pm2_bash
 	Add_cron_update_hosts_steamcommunity
 	Remove_hosts_log_week
@@ -606,6 +640,7 @@ Manage_ArchiSteamFarm_Panel() {
 3.delete
 4.monit
 5.log
+6.screen
 "
 	read aNumber
 	case $aNumber in
@@ -624,6 +659,9 @@ Manage_ArchiSteamFarm_Panel() {
 	5)
 		Manage_ArchiSteamFarm_log
 		;;
+	6)
+		Manage_ArchiSteamFarm_screen_start
+		;;
 	*)
 		exit 0
 		;;
@@ -634,6 +672,7 @@ echo -e "
 1.安装
 2.管理
 "
+menu_status_ArchiSteamFarm
 read aNumber
 case $aNumber in
 1)
