@@ -1,58 +1,8 @@
 #!/usr/bin/env bash
 
 #support system :
-#Tencent Debian 8.2 /Debian 9 /centos 7.0 /Ubuntu server 14.04.1 LTS 64bit/Ubuntu 16.04.1 LTS
-#Vultr Debian 8 / centos 7 /Ubuntu 14.04 x64 /Ubuntu 16.04.3 LTS
-: <<infomation
-PRETTY_NAME="Debian GNU/Linux 8 (jessie)"
-NAME="Debian GNU/Linux"
-VERSION_ID="8"
-VERSION="8 (jessie)"
-ID=debian
-HOME_URL="http://www.debian.org/"
-SUPPORT_URL="http://www.debian.org/support/"
-BUG_REPORT_URL="https://bugs.debian.org/"
-
-PRETTY_NAME="Debian GNU/Linux 9 (stretch)"
-NAME="Debian GNU/Linux"
-VERSION_ID="9"
-VERSION="9 (stretch)"
-ID=debian
-HOME_URL="https://www.debian.org/"
-SUPPORT_URL="https://www.debian.org/support"
-BUG_REPORT_URL="https://bugs.debian.org/"
-
-
-NAME="CentOS Linux"
-VERSION="7 (Core)"
-ID="centos"
-ID_LIKE="rhel fedora"
-VERSION_ID="7"
-PRETTY_NAME="CentOS Linux 7 (Core)"
-ANSI_COLOR="0;31"
-CPE_NAME="cpe:/o:centos:centos:7"
-HOME_URL="https://www.centos.org/"
-BUG_REPORT_URL="https://bugs.centos.org/"
-
-CENTOS_MANTISBT_PROJECT="CentOS-7"
-CENTOS_MANTISBT_PROJECT_VERSION="7"
-REDHAT_SUPPORT_PRODUCT="centos"
-REDHAT_SUPPORT_PRODUCT_VERSION="7"
-
-Ubuntu 16.04.1 LTS
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-CentOS
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-Debian
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-infomation
+#Tencent Debian 8.2 /Debian 9 /centos 7.0(OK) /Ubuntu server 14.04.1 LTS 64bit/Ubuntu 16.04.1 LTS
+#Vultr Debian9/ Debian 8（OK） / centos 7(OK) /Ubuntu 14.04 x64 /Ubuntu 16.04.3 LTS
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/ArchiSteamFarm:/opt/Manage_ArchiSteamFarm:/root/.nvm/versions/node/v8.11.1/bin
 export PATH
@@ -69,7 +19,6 @@ Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_p
 Info="${Green}[信息]${Font}"
 OK="${Green}[OK]${Font}"
 Error="${Red}[错误]${Font}"
-Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
 
 source /etc/os-release
 VERSION=$(echo ${VERSION} | awk -F "[()]" '{print $2}')
@@ -78,15 +27,31 @@ bit=$(uname -m)
 jq_file="/usr/bin/jq"
 ArchiSteamFarm_files="/opt/ArchiSteamFarm"
 
+Centos_Disable_Firewalld_Enable_Iptables() {
+	echo -e "${Info} ${GreenBG} 尝试停止Firewalld ${Font}"
+	systemctl stop firewalld
+	echo -e "${Info} ${GreenBG} 尝试关闭Firewalld ${Font}"
+	systemctl disable firewalld
+	yum update -y
+	echo -e "${Info} ${GreenBG} 准备安装IPtables ${Font}"
+	yum install -y iptables-services
+	echo -e "${Info} ${GreenBG} 尝试启动IPtables ${Font}"
+	systemctl start iptables
+	echo -e "${Info} ${RedBG} 正在尝试把IPtables设置为开机自启 ${Font} \n${Info} ${RedBG} 请自行重启确认 ${Font}"
+	systemctl enable iptables.service
+	echo -e "${Info} ${GreenBG} 若下面为IPtables链的信息${Font} \n${Info} ${GreenBG} 则IPtables安装正常 ${Font}"
+	iptables -L
+}
+
 Qcloud_source() {
-	echo -e "国内机子要启用，国外机子不用管"
-	echo -e "是否启用七牛云源?[Y/n]"
+	echo -e "${Info} ${RedBG} 国内机子要启用，国外机子不用管 ${Font}"
+	echo -e "${Info} ${RedBG} 是否启用七牛云源?[Y/n] ${Font}"
 	stty erase '^H' && read -p "(默认: N):" qcloud_enable_yn
 	[[ -z "${qcloud_enable_yn}" ]] && ssr_enable_yn="n"
 	if [[ "${qcloud_enable_yn}" == [Yy] ]]; then
 		qcloud_enable="1"
 	else
-		echo "不使用七牛云源"
+		echo "${Info} ${RedBG} 不使用七牛云源 ${Font}"
 	fi
 }
 
@@ -116,6 +81,15 @@ Check_system_bit() {
 	fi
 }
 
+Check_install_ArchiSteamFarm() {
+	if [[ -e ${ArchiSteamFarm_files} ]]; then
+		echo -e "${Info} ${GreenBG} 已经安装ArchiSteamFarm ${Font} \n ${Info} ${RedBG} 如需重装 请先到管理面板进行选择移除ArchiSteamFarm ${Font}"
+		exit 0
+	else
+		echo -e "${Info} ${GreenBG} 未安装ArchiSteamFarm ${Font} \n${Info} ${GreenBG} 准备安装ArchiSteamFarm ${Font}"
+	fi
+}
+
 Check_system_Install_NetCore() {
 	echo -e "${ID}"
 	echo -e "${VERSION_ID}"
@@ -136,6 +110,7 @@ Check_system_Install_NetCore() {
 		yum install -y dotnet-sdk-2.0.0
 		export PATH=$PATH:$HOME/dotnet
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "debian" && ${VERSION_ID} == "8" ]]; then
 		## Debian 8
 		echo "这里是Debian8的配置"
@@ -156,6 +131,7 @@ Check_system_Install_NetCore() {
 		apt-get install dotnet-sdk-2.0.0 -y
 		export PATH=$PATH:$HOME/dotnet
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "debian" && ${VERSION_ID} == "9" ]]; then
 		## Debian 9
 		echo "这里是Debian9的配置"
@@ -176,6 +152,7 @@ Check_system_Install_NetCore() {
 		apt-get install dotnet-sdk-2.0.0 -y
 		export PATH=$PATH:$HOME/dotnet
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}") -eq 17.10 ]]; then
 		## Ubuntu 17.10
 		echo "这里是Ubuntu 17.10的配置"
@@ -194,6 +171,7 @@ Check_system_Install_NetCore() {
 		apt-get update
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}") -eq 17.04 ]]; then
 		## Ubuntu 17.04
 		echo "这里是Ubuntu 17.04的配置"
@@ -213,6 +191,7 @@ Check_system_Install_NetCore() {
 		apt-get update
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -eq 16 ]]; then
 		## Ubuntu 16
 		echo "这里是Ubuntu 16的配置"
@@ -231,6 +210,7 @@ Check_system_Install_NetCore() {
 		apt-get update
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}" | cut -d '.' -f1) -eq 14 ]]; then
 		## Ubuntu 14
 		echo "这里是Ubuntu 14的配置"
@@ -250,6 +230,7 @@ Check_system_Install_NetCore() {
 		apt-get update
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
+		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
 	elif [[ "${ID}" == "raspbian" && $(echo "${VERSION_ID}") -eq 9 ]]; then
 		echo -e "${OK} ${GreenBG} 当前系统为 ${ID} ${VERSION_ID} ${Font} "
 		Steam_information_account_Get
@@ -321,7 +302,6 @@ Raspberry_Pi_Install_Dotnet() {
 Is_root() {
 	if [ $(id -u) == 0 ]; then
 		echo -e "${OK} ${GreenBG} 当前用户是root用户，进入安装流程 ${Font} "
-		sleep 3
 	else
 		echo -e "${Error} ${RedBG} 当前用户不是root用户，请使用${Green_background_prefix} sudo su ${Font_color_suffix}来获取临时ROOT权限（执行后会提示输入当前账号的密码） ${Font}"
 		exit 1
@@ -331,15 +311,20 @@ Is_root() {
 Install_nvm_node_V8.11.1_PM2() {
 	${INS} update
 	${INS} install wget -y
+	echo -e "${Info} ${GreenBG} nvm安装阶段 ${Font}"
 	wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash #This install nvm
 	export NVM_DIR="$HOME/.nvm"
 	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-	nvm install 8.11.1                                                 # This install node v8.11.1
-	node -v                                                            # Show node version
-	npm i -g nrm                                                       # Use npm install nrm
-	nrm use taobao                                                     # Registry set to: https://registry.npm.taobao.org/
-	npm i -g pm2                                                       # This install pm2
+	echo -e "${Info} ${GreenBG} node安装阶段 ${Font}"
+	nvm install 8.11.1 # This install node v8.11.1
+	node -v            # Show node version
+	#npm i -g nrm                                                       # Use npm install nrm
+	#if [[ ${nrm_enable}="1" ]] ;then
+	#nrm use taobao                                                     # Registry set to: https://registry.npm.taobao.org/
+	#fi
+	echo -e "${Info} ${GreenBG} pm2安装阶段 ${Font}"
+	npm i -g pm2 # This install pm2
 }
 
 JQ_install() {
@@ -359,14 +344,14 @@ JQ_install() {
 				chmod +x ./jq
 				mv jq /usr/bin
 				source ~/.bashrc
-				echo -e "\n ${Info} JQ解析器 安装完成，继续..."
+				echo -e "\n ${Info} ${GreenBG} JQ解析器 安装完成，继续... ${Font}"
 				break
 			else
-				echo -e "\n JQ解析器 下载失败 重新下载"
+				echo -e "\n ${Error} ${RedBG} JQ解析器 下载失败 重新下载 ${Font}"
 			fi
 		done
 	else
-		echo -e "\n ${Info} JQ解析器 已安装，继续..."
+		echo -e "\n ${Info} ${GreenBG} JQ解析器 已安装，继续... ${Font}"
 	fi
 }
 
@@ -381,9 +366,10 @@ Add_hosts_steamcommunity() {
 		cat >>/etc/hosts <<EOF
 IPAddress steamcommunity.com
 EOF
-		echo -e "sed修改hosts"
+		echo -e "${Info} ${GreenBG} 使用sed修改hosts ${Font}"
 		sed -i -e 's#IPAddress#'"$(echo $(Get_steamcommunity_ip))"'#g' /etc/hosts
-		cat /etc/hosts | grep steamcommunity.com
+		ip_address=$(cat /etc/hosts | grep steamcommunity.com)
+		echo -e "${Info} ${GreenBG} ${ip_address} ${Font}"
 	else
 		get_ip=$(cat /etc/hosts | grep steamcommunity.com | cut -d ' ' -f 1)
 		echo "${get_ip}"
@@ -395,22 +381,46 @@ EOF
 }
 
 Add_cron_update_hosts_steamcommunity() {
-	wget --no-check-certificate https://github.com/zsnmwy/Temporary-storage/releases/download/V0.5/Add_cron_update_hosts_steamcommunity.sh
-	chmod 777 Add_cron_update_hosts_steamcommunity.sh
-	mv Add_cron_update_hosts_steamcommunity.sh /etc/cron.hourly
-	echo "Add Update-hosts-steamcommunity.sh"
+	while true; do
+		echo -e "${Info} ${GreenBG} 尝试获取steamcommunity hosts 更新脚本 ${Font}"
+		if [[ ${qcloud_enable} == "1" ]]; then
+			wget http://p2feur8d9.bkt.clouddn.com/Add_cron_update_hosts_steamcommunity.sh
+		else
+			wget --no-check-certificate https://github.com/zsnmwy/Temporary-storage/releases/download/V0.5/Add_cron_update_hosts_steamcommunity.sh
+		fi
+		if [[ -e Add_cron_update_hosts_steamcommunity.sh ]]; then
+			chmod 777 Add_cron_update_hosts_steamcommunity.sh
+			mv Add_cron_update_hosts_steamcommunity.sh /etc/cron.hourly
+			echo "${OK} ${GreenBG}  Add Update-hosts-steamcommunity.sh ${Font}"
+			break
+		else
+			echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
+		fi
+	done
 }
 
 Remove_hosts_log_week() {
-	wget --no-check-certificate https://github.com/zsnmwy/Temporary-storage/releases/download/V0.5/Remove_hosts_log_week.sh
-	chmod 777 Remove_hosts_log_week.sh
-	mv Remove_hosts_log_week.sh /etc/cron.weekly
-	echo "Add Remove_hosts_log_week.sh"
+	while true; do
+		echo -e "${Info} ${GreenBG} 尝试获取remove hosts log 脚本 ${Font}"
+		if [[ ${qcloud_enable} == "1" ]]; then
+			wget http://p2feur8d9.bkt.clouddn.com/Remove_hosts_log_week.sh
+		else
+			wget --no-check-certificate wget --no-check-certificate https://github.com/zsnmwy/Temporary-storage/releases/download/V0.5/Remove_hosts_log_week.sh
+		fi
+		if [[ -e Remove_hosts_log_week.sh ]]; then
+			chmod 777 Remove_hosts_log_week.sh
+			mv Remove_hosts_log_week.sh /etc/cron.weekly
+			echo "${OK} ${GreenBG}  Add Remove_hosts_log_week.sh ${Font}"
+			break
+		else
+			echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
+		fi
+	done
 }
 
 ArchiSteamFarm_Install() {
 	while true; do
-		echo -e "获取 ArchiSteamFarm 最新稳定版"
+		echo -e "${Info} ${RedBG} 获取 ArchiSteamFarm 最新稳定版 ${Font}"
 		if [[ ${qcloud_enable} == "1" ]]; then
 			wget --no-check-certificate -P /root/ -O ArchiSteamFarm.zip http://p2feur8d9.bkt.clouddn.com/ASF-generic.zip
 		else
@@ -418,14 +428,47 @@ ArchiSteamFarm_Install() {
 		fi
 
 		if [[ -e /root/ArchiSteamFarm.zip ]]; then
-			echo -e "下载完成 开始解压"
+			echo -e "${Info} ${GreenBG} 下载完成 开始解压 ${Font}"
 			unzip -o -d ${ArchiSteamFarm_files} /root/ArchiSteamFarm.zip
-			echo -e "解压完成"
+			echo -e "${OK} ${GreenBG} 解压完成 ${Font}"
 			rm /root/ArchiSteamFarm.zip
 			break
 		else
-			echo -e "网络超时 下载失败 重新下载"
+			echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
 		fi
+	done
+}
+
+Choose_language() {
+	while true; do
+		echo -e "
+选择ArchiSteamFarm的语言
+${Green_font_prefix}1.${Font_color_suffix}zh-CN 简体
+${Green_font_prefix}2.${Font_color_suffix}zh-TW	繁体
+${Green_font_prefix}3.${Font_color_suffix}English 英语
+
+请输入数字[1-3]:
+"
+		read aNum
+		case $aNum in
+		1)
+			ArchiSteamFarm_json_English_change_to_zh-CN
+			echo -e "${OK} ${GreenBG} zh-CN ${Font}"
+			break
+			;;
+		2)
+			ArchiSteamFarm_json_English_change_to_zh-TW
+			echo -e"${OK} ${GreenBG} zh-TW ${Font}"
+			break
+			;;
+		3)
+			echo -e "${OK} ${GreenBG} English ${Font}"
+			break
+			;;
+		*)
+			echo -e "${Error} ${RedBG} 请输入正确的数字 ${Font}"
+			;;
+		esac
 	done
 }
 
@@ -461,6 +504,42 @@ ArchiSteamFarm_json_English_change_to_zh-CN() {
 	"UpdatePeriod": 24
 }
 EOF
+	cd /root
+}
+
+# 设置ArchiSteamFarm为繁体中文
+ArchiSteamFarm_json_English_change_to_zh-TW() {
+	cd ${ArchiSteamFarm_files}/config
+	cat >${ArchiSteamFarm_files}/config/ASF.json <<EOF
+{
+	"AutoRestart": true,
+	"BackgroundGCPeriod": 0,
+	"Blacklist": [],
+	"ConfirmationsLimiterDelay": 10,
+	"ConnectionTimeout": 60,
+	"CurrentCulture": "zh-TW",
+	"Debug": false,
+	"FarmingDelay": 15,
+	"GiftsLimiterDelay": 1,
+	"Headless": false,
+	"IdleFarmingPeriod": 8,
+	"InventoryLimiterDelay": 3,
+	"IPCPassword": null,
+	"IPCPrefixes": [
+		"http://127.0.0.1:1242/"
+	],
+	"LoginLimiterDelay": 10,
+	"MaxFarmingTime": 10,
+	"MaxTradeHoldDuration": 15,
+	"OptimizationMode": 0,
+	"Statistics": true,
+	"SteamOwnerID": 0,
+	"SteamProtocols": 1,
+	"UpdateChannel": 1,
+	"UpdatePeriod": 24
+}
+EOF
+	cd /root
 }
 
 # 获取用户的steam账号
@@ -474,8 +553,7 @@ Steam_information_account_Get() {
 		if [[ ${Steam_account_first} == ${Steam_account_second} ]]; then
 			break
 		else
-			echo -e "${Error} 两次输入的账号名称不正确 ! 三秒后重新输入"
-			sleep 3
+			echo -e "${Error} ${RedBG} 两次输入的账号名称不正确 ! 请重新输入 ${Font}"
 		fi
 	done
 }
@@ -487,19 +565,19 @@ Steam_information_password_Get() {
 		echo -e "\n"
 		read -s -p "输入你的steam密码：" Steam_account_password_first
 		echo -e "\n"
+		echo -e "\n"
 		read -s -p "再次输入你的steam密码：" Steam_account_password_second
 		if [[ ${Steam_account_password_first} == ${Steam_account_password_second} ]]; then
 			break
 		else
-			echo -e "${Error} 两次输入的密码不正确 ! 三秒后重新输入"
-			sleep 3
+			echo -e "${Error} ${RedBG} 两次输入的密码不正确 ! 重新输入 ${Font}"
 		fi
 	done
 }
 
 # 添加一个机器人/BOT 配置文件名为账户名
 Bot_Add() {
-	echo -e "准备添加BOT"
+	echo -e "${Info} ${GreenBG} 准备添加BOT ${Font}"
 	touch ${ArchiSteamFarm_files}/config/${Steam_account_second}.json
 	cat >${ArchiSteamFarm_files}/config/${Steam_account_second}.json <<EOF
 {
@@ -510,7 +588,7 @@ Bot_Add() {
 EOF
 	sed -i 's/Steam_account_account_second/'"$(echo ${Steam_account_second})"'/' ${ArchiSteamFarm_files}/config/${Steam_account_second}.json
 	sed -i 's/Steam_account_password_second/'"$(echo ${Steam_account_password_second})"'/' ${ArchiSteamFarm_files}/config/${Steam_account_second}.json
-	echo -e "添加BOT完成"
+	echo -e "${OK} ${GreenBG} 添加BOT完成 ${Font}"
 }
 
 Add_start_script_pm2_bash() {
@@ -525,6 +603,7 @@ export PATH
 cd /opt/ArchiSteamFarm
 dotnet ArchiSteamFarm.dll
 EOF
+	cd /root
 }
 
 Add_start_pm2_yaml() {
@@ -544,20 +623,40 @@ apps:
 EOF
 }
 
-Manage_ArchiSteamFarm_start() {
+Manage_ArchiSteamFarm_normal_start_app() {
+	ArchiSteamFarm_get_id_pm2=$(pm2 ls | grep ArchiSteamFarm)
+	if [[ -n ${ArchiSteamFarm_get_id_pm2} ]]; then
+		ArchiSteamFarm_status=$(pm2 show ArchiSteamFarm | grep status | awk -F ' ' '{print $4}')
+		if [[ ${ArchiSteamFarm_status} == "online" ]]; then
+			echo -e "${Info} ${GreenBG} ArchiSteamFarm 在PM2中正常运行 ${Font}\n${Info} ${RedBG} 如需以常规方式运行 请先用脚本暂停ArchiSteamFarm ${Font}"
+			echo -e "${Green_font_prefix} 五秒后返回管理选择面板 ${Font_color_suffix}"
+			sleep 5
+			Manage_ArchiSteamFarm_Panel
+		elif [[" $ArchiSteamFarm_status" == "errored" ]]; then
+			echo -e "${Error} ${RedBG} 检测到ArchiSteamFarm出现错误 ${Font}\n ${Info} ${RedBG} 尝试从PM2中移除ArchiSteamFarm 然后以常规方式启动ArchiSteamFarm ${Font}"
+			Manage_ArchiSteamFarm_delete_app
+			cd ${ArchiSteamFarm_files}
+			dotnet ArchiSteamFarm.dll
+		fi
+	else
+		cd ${ArchiSteamFarm_files}
+		dotnet ArchiSteamFarm.dll
+	fi
+}
+
+Manage_ArchiSteamFarm_start_Add_app() {
 	pm2 start ArchiSteamFarm.sh
 }
 
-Manage_ArchiSteamFarm_start_ls() {
-	pm2 start ArchiSteamFarm.sh
-	pm2 ls
+Manage_ArchiSteamFarm_restart_app() {
+	pm2 restart ArchiSteamFarm
 }
 
-Manage_ArchiSteamFarm_stop() {
+Manage_ArchiSteamFarm_stop_app() {
 	pm2 stop ArchiSteamFarm
 }
 
-Manage_ArchiSteamFarm_delete() {
+Manage_ArchiSteamFarm_delete_app() {
 	pm2 delete ArchiSteamFarm
 }
 
@@ -569,6 +668,74 @@ Manage_ArchiSteamFarm_log() {
 	pm2 logs ArchiSteamFarm
 }
 
+Check_ArchiSteamFarm_App_Add_start() {
+	ArchiSteamFarm_get_id_pm2_=$(pm2 ls | grep ArchiSteamFarm)
+	if [[ -n ${ArchiSteamFarm_get_id_pm2_} ]]; then
+		echo -e "${Info} ${RedBG} 已经添加了ArchiSteamFarm到PM2 本操作跳过 ${Font}"
+		Manage_ArchiSteamFarm_Panel
+	fi
+}
+Check_ArchiSteamFarm_App_Add_restart_stop_delete_log() {
+	ArchiSteamFarm_get_id_pm2_1=$(pm2 ls | grep ArchiSteamFarm)
+	if [[ ! -n ${ArchiSteamFarm_get_id_pm2_1} ]]; then
+		echo -e "${Info} ${RedBG} 没有添加ArchiSteamFarm到PM2 本操作跳过 ${Font}"
+		Manage_ArchiSteamFarm_Panel
+	fi
+}
+
+Check_ArchiSteamFarm_App_Add_screen() {
+	ArchiSteamFarm_get_id_pm2_1=$(pm2 ls | grep ArchiSteamFarm)
+	if [[ ! -n ${ArchiSteamFarm_get_id_pm2_1} ]]; then
+		echo -e "${Info} ${RedBG} 没有添加ArchiSteamFarm到PM2 从PM2删除ArchiSteamFarm操作 跳过 ${Font}"
+	else
+		Manage_ArchiSteamFarm_delete_app
+	fi
+}
+
+Check_ArchiSteamFarm_App_online() {
+	ArchiSteamFarm_get_id_pm2=$(pm2 ls | grep ArchiSteamFarm)
+	if [[ -n ${ArchiSteamFarm_get_id_pm2} ]]; then
+		ArchiSteamFarm_status=$(pm2 show ArchiSteamFarm | grep status | awk -F ' ' '{print $4}')
+		if [[ ${ArchiSteamFarm_status} == "online" ]]; then
+			echo -e "${Info} ${RedBG} ArchiSteamFarm已经在正常运行(由PM2管理) 该操作跳过 ${Font}"
+			Manage_ArchiSteamFarm_Panel
+		
+		fi
+	fi
+}
+
+Check_ArchiSteamFarm_install_succeed() {
+	dotnet_version=$(dotnet --version)
+	pm2_version=$(pm2 -v)
+	nvm_version=$(nvm --version)
+	node_version=$(node -v)
+	echo -e "${Info} ${RedBG} 若出现的版本号不是类似于 2.0.0   V8.11.1   请检查日志 ${Font}"
+	echo -e "${Info} ${RedBG} dotnet的版本为 ${Font} ${dotnet_version}"
+	echo -e "${Info} ${RedBG} pm2的版本为 ${Font}   ${pm2_version}"
+	echo -e "${Info} ${RedBG} nvm的版本为 ${Font}   ${nvm_version}"
+	echo -e "${Info} ${RedBG} node的版本为 ${Font}  ${node_version}"
+	if [[ -e ${ArchiSteamFarm_files} ]]; then
+		echo -e "${OK} ${GreenBG} ArchiSteamFarm文件夹已找到 ${Font}"
+	else
+		echo -e "${Error} ${RedBG} ArchiSteamFarm文件夹没有找到 请查看日志 检查网络是否异常"
+	fi
+	if [[ -e /opt/Manage_ArchiSteamFarm/ArchiSteamFarm.sh ]]; then
+		echo -e "${OK} ${GreenBG} ArchiSteamFarm.sh已找到 ${Font}"
+	else
+		echo -e "${Error} ${RedBG} ArchiSteamFarm.sh未找到 请检查日志 ${Font}"
+	fi
+	if [[ -e /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh ]]; then
+		echo -e "${OK} ${GreenBG} 自动更新steamcommunity-hosts-脚本已找到 ${Font}"
+	else
+		echo -e "${Error} ${RedBG} 自动更新steamcommunity-hosts-脚本未找到 请检查日志及网络 ${Font}"
+	fi
+	if [[ -e /etc/cron.weekly/Remove_hosts_log_week.sh ]]; then
+		echo -e "${OK} ${GreenBG} 自动清理steamcommunity-hosts-日志脚本已找到 ${Font}"
+	else
+		echo -e "${Error} ${RedBG} 自动清理steamcommunity-hosts-日志脚本未找到 请检查日志及网络 ${Font}"
+	fi
+	bash
+}
 
 menu_status_ArchiSteamFarm() {
 	if [[ -e ${ArchiSteamFarm_files} ]]; then
@@ -583,7 +750,7 @@ menu_status_ArchiSteamFarm() {
 				echo -e " ${Red_font_prefix}错误${Font_color_suffix} ArchiSteamFarm出错 \n 请重载ArchiSteamFarm \n 或在管理移除ArchiSteamFarm后再次加入 \n 实在不行就去提issue"
 			fi
 		else
-			echo -e "${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}已安装${Font_color_suffix} 但 ${Red_font_prefix}未加入PM2管理${Font_color_suffix}"
+			echo -e "${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}已安装${Font_color_suffix} 但 ${Red_font_prefix}未加入PM2进行管理${Font_color_suffix}"
 		fi
 	else
 		echo -e " ${Red_font_prefix}ArchiSteamFarm${Font_color_suffix} 当前状态: ${Red_font_prefix}未安装${Font_color_suffix}"
@@ -593,8 +760,14 @@ menu_status_ArchiSteamFarm() {
 Source_bash() {
 	source ~/.bashrc
 	. ~/.bashrc
-	bash
 	echo "source ~/.bashrc succeed"
+	cd /root
+}
+
+Remove_all_file() {
+	rm /etc/cron.weekly/Remove_hosts_log_week.sh
+	rm /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh
+	rm -r ${ArchiSteamFarm_files}
 }
 
 Raspberry_Pi_Install() {
@@ -611,52 +784,87 @@ Raspberry_Pi_Install() {
 General_install() {
 	Is_root
 	Check_system_bit
+	Check_install_ArchiSteamFarm
 	Qcloud_source
-	Github_hosts
+	#Github_hosts
+	#Nrm_source
 	Check_system_Install_NetCore
 	Install_nvm_node_V8.11.1_PM2
 	JQ_install
-	Add_hosts_steamcommunity
 	ArchiSteamFarm_Install
 	Bot_Add
-	ArchiSteamFarm_json_English_change_to_zh-CN
 	#Add_start_pm2_yaml
 	Add_start_script_pm2_bash
 	Add_cron_update_hosts_steamcommunity
+	Add_hosts_steamcommunity
 	Remove_hosts_log_week
+	Choose_language
 	Source_bash
-	cd ~
+	Check_ArchiSteamFarm_install_succeed
 }
-#General_install
 
 Manage_ArchiSteamFarm_Panel() {
 	echo -e "
-1.start
-2.stop
-3.delete
-4.monit
-5.log
-6.screen
+${Green_font_prefix}1.${Font_color_suffix}常规方式启动ArchiSteamFarm
+${Green_font_prefix}2.${Font_color_suffix}添加ArchiSteamFarm到PM2进行管理  (添加&&启动&&查看ArchiSteamFarm日志)
+${Green_font_prefix}3.${Font_color_suffix}启动ArchiSteamFarm  (仅仅启动存在于PM2中的ArchiSteamFarm)
+${Green_font_prefix}4.${Font_color_suffix}停止ArchiSteamFarm  (仅仅停止存在于PM2中的ArchiSteamFarm)
+${Green_font_prefix}5.${Font_color_suffix}从PM2中移除ArchiSteamFarm
+${Green_font_prefix}6.${Font_color_suffix}查看ArchiSteamFarm的日志
+——————————————————————————————
+${Green_font_prefix}7.${Font_color_suffix}screen方式启动ArchiSteamFarm(强烈推荐使用PM2)
+——————————————————————————————
+${Green_font_prefix}8.${Font_color_suffix}关闭Firewalld并启用IPtables(仅仅限于centos7)
+——————————————————————————————
+${Green_font_prefix}9.${Font_color_suffix}移除ArchiSteamFarm(不会卸载node/nvm/.NET Core)
+${Green_font_prefix}10.${Font_color_suffix}返回上一层
+${Green_font_prefix}11.${Font_color_suffix}退出
 "
-	read aNumber
+	menu_status_ArchiSteamFarm
+	echo "你的选择是(数字):" && read aNumber
+
 	case $aNumber in
 	1)
-		Manage_ArchiSteamFarm_start
+		Manage_ArchiSteamFarm_normal_start_app
 		;;
 	2)
-		Manage_ArchiSteamFarm_stop
-		;;
-	3)
-		Manage_ArchiSteamFarm_delete
-		;;
-	4)
-		pm2 monit
-		;;
-	5)
+		Check_ArchiSteamFarm_App_Add_start
+		Manage_ArchiSteamFarm_start_Add_app
 		Manage_ArchiSteamFarm_log
 		;;
+	3)
+		Check_ArchiSteamFarm_App_online
+		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
+		Manage_ArchiSteamFarm_restart_app
+		;;
+	4)
+		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
+		Manage_ArchiSteamFarm_stop_app
+		;;
+	5)
+		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
+		Manage_ArchiSteamFarm_delete_app
+		;;
 	6)
+		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
+		Manage_ArchiSteamFarm_log
+		;;
+	7)
+		Check_ArchiSteamFarm_App_Add_screen
 		Manage_ArchiSteamFarm_screen_start
+		;;
+	8)
+		if [[ "${ID}" == "centos" && ${VERSION_ID}="7" ]]; then
+			Centos_Disable_Firewalld_Enable_Iptables
+		else
+			echo -e "仅仅支持centos7"
+		fi
+		;;
+	9)
+		Remove_all_file
+		;;
+	10)
+		Start_Panel
 		;;
 	*)
 		exit 0
@@ -664,20 +872,33 @@ Manage_ArchiSteamFarm_Panel() {
 	esac
 }
 
-echo -e "
-1.安装
-2.管理"
-menu_status_ArchiSteamFarm
-echo "你的选择是(数字):" && read aNumber
+Start_Panel() {
+	echo -e "
+欢迎使用一键搭建ArchiSteamFarm 云挂卡脚本 V1.0
+Author:zsnmwy
+Github:zsnmwy
+steam:总是那么无语
+steamcn:总是那么无语
+来加我好友(*@ο@*) 哇～
 
-case $aNumber in
-1)
-	General_install
-	;;
-2)
-	Manage_ArchiSteamFarm_Panel
-	;;
-*)
-	exit 0
-	;;
-esac
+1.安装
+2.管理
+3.退出脚本"
+
+	menu_status_ArchiSteamFarm
+	echo "你的选择是(数字):" && read aNumber
+
+	case $aNumber in
+	1)
+		General_install
+		;;
+	2)
+		Manage_ArchiSteamFarm_Panel
+		;;
+	*)
+		exit 0
+		;;
+	esac
+
+}
+Start_Panel
