@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #support system :
-#Tencent Debian 8.2 /Debian 9 /centos 7.0(OK) /Ubuntu server 14.04.1 LTS 64bit/Ubuntu 16.04.1 LTS
+#Tencent Debian 8.2(OK) /Debian 9(OK) /centos 7.0(OK) / Ubuntu server 14.04.1 LTS 64bit(OK) / Ubuntu 16.04.1 LTS (OK)
 #Vultr Debian9(OK)/ Debian 8（OK） / centos 7(OK) /Ubuntu 14.04 x64（OK） /Ubuntu 16.04.3 LTS(OK)/Ubuntu 17.10 x64(OK)
 #兼容SSR centos7 doub脚本
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/ArchiSteamFarm:/opt/Manage_ArchiSteamFarm:/root/.nvm/versions/node/v8.11.1/bin
@@ -769,6 +769,7 @@ Remove_all_file() {
 	rm /etc/cron.weekly/Remove_hosts_log_week.sh
 	rm /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh
 	rm -r ${ArchiSteamFarm_files}
+	rm -r /opt/Manage_ArchiSteamFarm
 }
 
 Raspberry_Pi_Install() {
