@@ -2,8 +2,8 @@
 
 #support system :
 #Tencent Debian 8.2 /Debian 9 /centos 7.0(OK) /Ubuntu server 14.04.1 LTS 64bit/Ubuntu 16.04.1 LTS
-#Vultr Debian9/ Debian 8（OK） / centos 7(OK) /Ubuntu 14.04 x64 /Ubuntu 16.04.3 LTS
-
+#Vultr Debian9(OK)/ Debian 8（OK） / centos 7(OK) /Ubuntu 14.04 x64（OK） /Ubuntu 16.04.3 LTS(OK)/Ubuntu 17.10 x64(OK)
+#兼容SSR centos7 doub脚本
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/ArchiSteamFarm:/opt/Manage_ArchiSteamFarm:/root/.nvm/versions/node/v8.11.1/bin
 export PATH
 # fonts color
@@ -51,7 +51,7 @@ Qcloud_source() {
 	if [[ "${qcloud_enable_yn}" == [Yy] ]]; then
 		qcloud_enable="1"
 	else
-		echo "${Info} ${RedBG} 不使用七牛云源 ${Font}"
+		echo -e "${Info} ${RedBG} 不使用七牛云源 ${Font}"
 	fi
 }
 
@@ -153,7 +153,7 @@ Check_system_Install_NetCore() {
 		export PATH=$PATH:$HOME/dotnet
 		dotnet --version
 		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
-	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}") -eq 17.10 ]]; then
+	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}") == "17.10" ]]; then
 		## Ubuntu 17.10
 		echo "这里是Ubuntu 17.10的配置"
 		echo "这里是Ubuntu 17.10的配置"
@@ -164,7 +164,7 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install curl wget unzip screen
+		apt-get install curl wget unzip screen -y
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-artful-prod artful main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -172,7 +172,7 @@ Check_system_Install_NetCore() {
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
 		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
-	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}") -eq 17.04 ]]; then
+	elif [[ "${ID}" == "ubuntu" && $(echo "${VERSION_ID}") == "17.04" ]]; then
 		## Ubuntu 17.04
 		echo "这里是Ubuntu 17.04的配置"
 		echo "这里是Ubuntu 17.04的配置"
@@ -184,11 +184,11 @@ Check_system_Install_NetCore() {
 		Steam_information_password_Get
 		INS="apt-get"
 		apt-get update
-		apt-get install curl wget unzip screen
+		apt-get install curl wget unzip screen -y
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-zesty-prod zesty main" > /etc/apt/sources.list.d/dotnetdev.list'
-		apt-get update
+		apt-get update -y
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
 		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
@@ -202,12 +202,12 @@ Check_system_Install_NetCore() {
 		Steam_information_account_Get
 		Steam_information_password_Get
 		INS="apt-get"
-		apt-get update
-		apt-get install curl wget unzip screen
+		apt-get update 
+		apt-get install curl wget unzip screen -y
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list'
-		apt-get update
+		apt-get update 
 		apt-get install dotnet-sdk-2.1.4 -y
 		dotnet --version
 		echo -e "${Info} ${GreenBG} 若出现dotnet的版本号 为安装正常 ${Font}"
@@ -222,8 +222,8 @@ Check_system_Install_NetCore() {
 		Steam_information_account_Get
 		Steam_information_password_Get
 		INS="apt-get"
-		apt-get update
-		apt-get install curl wget unzip screen
+		apt-get update 
+		apt-get install curl wget unzip screen -y
 		curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
 		mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
 		sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-trusty-prod trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
@@ -391,7 +391,7 @@ Add_cron_update_hosts_steamcommunity() {
 		if [[ -e Add_cron_update_hosts_steamcommunity.sh ]]; then
 			chmod 777 Add_cron_update_hosts_steamcommunity.sh
 			mv Add_cron_update_hosts_steamcommunity.sh /etc/cron.hourly
-			echo "${OK} ${GreenBG}  Add Update-hosts-steamcommunity.sh ${Font}"
+			echo -e "${OK} ${GreenBG}  Add Update-hosts-steamcommunity.sh ${Font}"
 			break
 		else
 			echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
@@ -410,7 +410,7 @@ Remove_hosts_log_week() {
 		if [[ -e Remove_hosts_log_week.sh ]]; then
 			chmod 777 Remove_hosts_log_week.sh
 			mv Remove_hosts_log_week.sh /etc/cron.weekly
-			echo "${OK} ${GreenBG}  Add Remove_hosts_log_week.sh ${Font}"
+			echo -e "${OK} ${GreenBG}  Add Remove_hosts_log_week.sh ${Font}"
 			break
 		else
 			echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
@@ -420,7 +420,7 @@ Remove_hosts_log_week() {
 
 ArchiSteamFarm_Install() {
 	while true; do
-		echo -e "${Info} ${RedBG} 获取 ArchiSteamFarm 最新稳定版 ${Font}"
+		echo -e "${Info} ${GreenBG} 获取 ArchiSteamFarm 最新稳定版 ${Font}"
 		if [[ ${qcloud_enable} == "1" ]]; then
 			wget --no-check-certificate -P /root/ -O ArchiSteamFarm.zip http://p2feur8d9.bkt.clouddn.com/ASF-generic.zip
 		else
@@ -458,7 +458,7 @@ ${Green_font_prefix}3.${Font_color_suffix}English 英语
 			;;
 		2)
 			ArchiSteamFarm_json_English_change_to_zh-TW
-			echo -e"${OK} ${GreenBG} zh-TW ${Font}"
+			echo -e "${OK} ${GreenBG} zh-TW ${Font}"
 			break
 			;;
 		3)
@@ -699,7 +699,7 @@ Check_ArchiSteamFarm_App_online() {
 		if [[ ${ArchiSteamFarm_status} == "online" ]]; then
 			echo -e "${Info} ${RedBG} ArchiSteamFarm已经在正常运行(由PM2管理) 该操作跳过 ${Font}"
 			Manage_ArchiSteamFarm_Panel
-		
+
 		fi
 	fi
 }
@@ -709,6 +709,7 @@ Check_ArchiSteamFarm_install_succeed() {
 	pm2_version=$(pm2 -v)
 	nvm_version=$(nvm --version)
 	node_version=$(node -v)
+	echo -e "\n\n${Info} ${GreenBG} 最后进行安装完整性确认 ${Font} \n"
 	echo -e "${Info} ${RedBG} 若出现的版本号不是类似于 2.0.0   V8.11.1   请检查日志 ${Font}"
 	echo -e "${Info} ${RedBG} dotnet的版本为 ${Font} ${dotnet_version}"
 	echo -e "${Info} ${RedBG} pm2的版本为 ${Font}   ${pm2_version}"
@@ -806,19 +807,17 @@ General_install() {
 Manage_ArchiSteamFarm_Panel() {
 	echo -e "
 ${Green_font_prefix}1.${Font_color_suffix}常规方式启动ArchiSteamFarm
-${Green_font_prefix}2.${Font_color_suffix}添加ArchiSteamFarm到PM2进行管理  (添加&&启动&&查看ArchiSteamFarm日志)
-${Green_font_prefix}3.${Font_color_suffix}启动ArchiSteamFarm  (仅仅启动存在于PM2中的ArchiSteamFarm)
-${Green_font_prefix}4.${Font_color_suffix}停止ArchiSteamFarm  (仅仅停止存在于PM2中的ArchiSteamFarm)
-${Green_font_prefix}5.${Font_color_suffix}从PM2中移除ArchiSteamFarm
-${Green_font_prefix}6.${Font_color_suffix}查看ArchiSteamFarm的日志
+${Green_font_prefix}2.${Font_color_suffix}添加ArchiSteamFarm到PM2进行 管理 && 启动 && 查看ArchiSteamFarm日志
+${Green_font_prefix}3.${Font_color_suffix}从PM2中移除ArchiSteamFarm
+${Green_font_prefix}4.${Font_color_suffix}查看ArchiSteamFarm的日志
 ——————————————————————————————
-${Green_font_prefix}7.${Font_color_suffix}screen方式启动ArchiSteamFarm(强烈推荐使用PM2)
+${Green_font_prefix}5.${Font_color_suffix}screen方式启动ArchiSteamFarm(强烈推荐使用PM2)
 ——————————————————————————————
-${Green_font_prefix}8.${Font_color_suffix}关闭Firewalld并启用IPtables(仅仅限于centos7)
+${Green_font_prefix}6.${Font_color_suffix}关闭Firewalld并启用IPtables(仅仅限于centos7)
 ——————————————————————————————
-${Green_font_prefix}9.${Font_color_suffix}移除ArchiSteamFarm(不会卸载node/nvm/.NET Core)
-${Green_font_prefix}10.${Font_color_suffix}返回上一层
-${Green_font_prefix}11.${Font_color_suffix}退出
+${Green_font_prefix}7.${Font_color_suffix}移除ArchiSteamFarm(不会卸载node/nvm/.NET Core)
+${Green_font_prefix}8.${Font_color_suffix}返回上一层
+${Green_font_prefix}9.${Font_color_suffix}退出
 "
 	menu_status_ArchiSteamFarm
 	echo "你的选择是(数字):" && read aNumber
@@ -833,41 +832,35 @@ ${Green_font_prefix}11.${Font_color_suffix}退出
 		Manage_ArchiSteamFarm_log
 		;;
 	3)
-		Check_ArchiSteamFarm_App_online
-		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
-		Manage_ArchiSteamFarm_restart_app
-		;;
-	4)
-		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
-		Manage_ArchiSteamFarm_stop_app
-		;;
-	5)
 		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
 		Manage_ArchiSteamFarm_delete_app
 		;;
-	6)
+	4)
 		Check_ArchiSteamFarm_App_Add_restart_stop_delete_log
 		Manage_ArchiSteamFarm_log
 		;;
-	7)
+	5)
 		Check_ArchiSteamFarm_App_Add_screen
 		Manage_ArchiSteamFarm_screen_start
 		;;
-	8)
+	6)
 		if [[ "${ID}" == "centos" && ${VERSION_ID}="7" ]]; then
 			Centos_Disable_Firewalld_Enable_Iptables
 		else
 			echo -e "仅仅支持centos7"
 		fi
 		;;
-	9)
+	7)
 		Remove_all_file
 		;;
-	10)
+	8)
 		Start_Panel
 		;;
-	*)
+	9)
 		exit 0
+		;;
+	*)
+		Manage_ArchiSteamFarm_Panel
 		;;
 	esac
 }
@@ -895,10 +888,16 @@ steamcn:总是那么无语
 	2)
 		Manage_ArchiSteamFarm_Panel
 		;;
-	*)
+	3)
 		exit 0
+		;;
+	*)
+		Start_Panel
 		;;
 	esac
 
 }
 Start_Panel
+
+#${Green_font_prefix}3.${Font_color_suffix}启动ArchiSteamFarm  (仅仅启动存在于PM2中的ArchiSteamFarm)
+#${Green_font_prefix}4.${Font_color_suffix}停止ArchiSteamFarm  (仅仅停止存在于PM2中的ArchiSteamFarm)
