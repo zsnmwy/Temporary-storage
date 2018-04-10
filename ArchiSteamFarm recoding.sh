@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+#Author:zsnmwy
 #support system :
 #Tencent Debian 8.2 /Debian 9 /centos 7.0(OK) /Ubuntu server 14.04.1 LTS 64bit/Ubuntu 16.04.1 LTS
 #Vultr Debian9(OK)/ Debian 8（OK） / centos 7(OK) /Ubuntu 14.04 x64（OK） /Ubuntu 16.04.3 LTS(OK)/Ubuntu 17.10 x64(OK)
