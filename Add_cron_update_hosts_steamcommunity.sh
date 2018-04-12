@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 Get_steamcommunity_ip(){
 	curl 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&name=steamcommunity.com&type=A' | jq -r '.Answer[0].data'
 }
