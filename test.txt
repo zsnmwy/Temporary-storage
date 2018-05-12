@@ -1,0 +1,16 @@
+max.oni.ga {
+    gzip
+    log /root/web.log
+    tls jane35622@163.com
+}
+
+echo "max.oni.ga {\
+    gzip\
+    log /root/web.log\
+    tls jane35622@163.com\
+    redir / https://steamusercontent-a.akamaihd.net/ugc/930434788914477969/C67391D8F6B4638C3133B1237287A7095E0F3AFB 301 \
+}" > Caddyfile
+
+
+    "file_url": "https://steamusercontent-a.akamaihd.net/ugc/930434788914477969/C67391D8F6B4638C3133B1237287A7095E0F3AFB/",
+https://steamusercontent-a.akamaihd.net/ugc/930434788914477969/C67391D8F6B4638C3133B1237287A7095E0F3AFB/
