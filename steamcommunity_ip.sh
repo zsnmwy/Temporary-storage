@@ -39,7 +39,7 @@ Get_steamcommunity_ip(){
     curl 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&name=steamcommunity.com&type=A' | cut -d '"' -f34
     if [ $? -eq 1 ]
     then
-        echo "${Error} ${RedBG} 从Cloudflare获取社区IP地址失败 ${Font}"
+        echo -e "${Error} ${RedBG} 从Cloudflare获取社区IP地址失败 ${OK} ${GreenBG}"
         exit 1
     fi
 }
@@ -47,7 +47,7 @@ Get_steamcommunity_ip(){
 Add_hosts_steamcommunity() {
     Check_hosts=$(cat /etc/hosts | grep steamcommunity.com)
     if [[ ! ${Check_hosts} ]]; then
-        echo -e "没有发现steam社区IP,准备增加到/etc/hosts"
+        echo -e "${Info} ${GreenBG} 没有发现steam社区IP,准备增加到/etc/hosts ${Font}"
         echo "$(echo $(Get_steamcommunity_ip)) steamcommunity.com" >> /etc/hosts
         judge "写入IP 到 /etc/hosts"
         ip_address=$(cat /etc/hosts | grep steamcommunity.com)
@@ -57,7 +57,7 @@ Add_hosts_steamcommunity() {
         echo "${get_ip}"
         sed -i -e 's#'"$(echo ${get_ip})"'#'"$(echo $(Get_steamcommunity_ip))"'#' /etc/hosts
         judge "使用sed修改社区IP地址"
-        echo "已经更新hosts"
+        echo -e "${OK} ${GreenBG} 已经更新hosts ${Font}"
         cat /etc/hosts | grep steamcommunity.com
     fi
     
@@ -67,7 +67,7 @@ Add_cron_update_hosts_steamcommunity() {
     while true; do
         if [ -e /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh ]
         then
-            echo "已经存在 Add_cron_update_hosts_steamcommunity.sh 跳过"
+            echo -e "${Info} ${GreenBG} 已经存在 Add_cron_update_hosts_steamcommunity.sh 跳过 ${Font}"
             break
         else
             echo -e "${Info} ${GreenBG} 尝试获取steamcommunity hosts 更新脚本 ${Font}"
@@ -109,7 +109,19 @@ Remove_hosts_log_week() {
     done
 }
 
-Is_root
-Add_hosts_steamcommunity
-Add_cron_update_hosts_steamcommunity
-Remove_hosts_log_week
+case $1 in
+    -d)
+        rm -f /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh
+        rm -f /etc/cron.weekly/Remove_hosts_log_week.sh
+        sed -i /steamcommunity/d /etc/hosts
+    ;;
+    *)
+        Is_root
+        rm -f /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh
+        rm -f /etc/cron.weekly/Remove_hosts_log_week.sh
+        sed -i /steamcommunity/d /etc/hosts
+        Add_hosts_steamcommunity
+        Add_cron_update_hosts_steamcommunity
+        Remove_hosts_log_week
+    ;;
+esac

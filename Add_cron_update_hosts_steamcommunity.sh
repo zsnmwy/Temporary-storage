@@ -3,11 +3,16 @@ Get_steamcommunity_ip(){
     curl 'https://cloudflare-dns.com/dns-query?ct=application/dns-json&name=steamcommunity.com&type=A' | cut -d '"' -f34
     if [ $? -eq 1 ]
     then
-        echo "${Error} ${RedBG} 从Cloudflare获取社区IP地址失败 ${Font}" >> /tmp/steamcommunity-hosts.log
+        echo "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 从Cloudflare获取社区IP地址失败" >> /tmp/steamcommunity-hosts.log
         exit 1
     fi
 }
 	get_ip=$(cat /etc/hosts | grep steamcommunity.com | cut -d ' ' -f 1)
+	if [ ! -n $get_ip ] 
+	then
+		echo "找不到要替换的IP地址 跳过" >> /tmp/steamcommunity-hosts.log
+		exit 1
+	fi
 	sed -i -e 's#'"$(echo ${get_ip})"'#'"$(echo $(Get_steamcommunity_ip))"'#' /etc/hosts
 	if [ $? -eq 1 ] 
 	then
