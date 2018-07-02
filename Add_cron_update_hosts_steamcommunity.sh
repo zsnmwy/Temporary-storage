@@ -16,9 +16,9 @@ Get_steamcommunity_ip(){
 	sed -i -e 's#'"$(echo ${get_ip})"'#'"$(echo $(Get_steamcommunity_ip))"'#' /etc/hosts
 	if [ $? -eq 1 ] 
 	then
-		echo "Fail...." >> /tmp/steamcommunity-hosts.log
+		echo "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] Fail...." >> /tmp/steamcommunity-hosts.log
 		exit 1
 	fi
 	echo "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 已经更新steamcommunity-hosts" >> /tmp/steamcommunity-hosts.log
 	hosts=$(cat /etc/hosts | grep steamcommunity.com)
-	echo -e "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 当前的steamcommunicty host 是  ${hosts} \n\n" >> /tmp/steamcommunity-hosts.log
+	echo -e "[$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 当前的steamcommunicty IP 是  ${hosts} \n\n" >> /tmp/steamcommunity-hosts.log
