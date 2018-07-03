@@ -67,15 +67,16 @@ Add_cron_update_hosts_steamcommunity() {
     while true; do
         if [ -e /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh ]
         then
-            echo -e "${Info} ${GreenBG} 已经存在 Add_cron_update_hosts_steamcommunity.sh 跳过 ${Font}"
+            echo -e "${Info} ${GreenBG} 已经存在 Add_cron_update_hosts_steamcommunity 跳过 ${Font}"
             break
         else
             echo -e "${Info} ${GreenBG} 尝试获取steamcommunity hosts 更新脚本 ${Font}"
             wget --no-check-certificate https://raw.githubusercontent.com/zsnmwy/Temporary-storage/master/Add_cron_update_hosts_steamcommunity.sh
             if [[ -e Add_cron_update_hosts_steamcommunity.sh ]]; then
                 chmod 777 Add_cron_update_hosts_steamcommunity.sh
-                mv Add_cron_update_hosts_steamcommunity.sh /etc/cron.hourly
-                echo -e "${OK} ${GreenBG}  Add Update-hosts-steamcommunity.sh ${Font}"
+                mv Add_cron_update_hosts_steamcommunity.sh Add_cron_update_hosts_steamcommunity
+                mv Add_cron_update_hosts_steamcommunity /etc/cron.hourly
+                echo -e "${OK} ${GreenBG}  Add Update-hosts-steamcommunity ${Font}"
                 break
             else
                 echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
@@ -90,15 +91,16 @@ Remove_hosts_log_week() {
     while true; do
         if [ -e /etc/cron.weekly/Remove_hosts_log_week.sh ]
         then
-            echo "已经存在 Remove_hosts_log_week.sh"
+            echo "已经存在 Remove_hosts_log_week"
             break
         else
             echo -e "${Info} ${GreenBG} 尝试获取remove hosts log 脚本 ${Font}"
             wget --no-check-certificate https://raw.githubusercontent.com/zsnmwy/Temporary-storage/master/Remove_hosts_log_week.sh
             if [[ -e Remove_hosts_log_week.sh ]]; then
                 chmod 777 Remove_hosts_log_week.sh
-                mv Remove_hosts_log_week.sh /etc/cron.weekly
-                echo -e "${OK} ${GreenBG}  Add Remove_hosts_log_week.sh ${Font}"
+                mv Remove_hosts_log_week.sh Remove_hosts_log_week
+                mv Remove_hosts_log_week /etc/cron.weekly
+                echo -e "${OK} ${GreenBG}  Add Remove_hosts_log_week ${Font}"
                 break
             else
                 echo -e "${Error} ${RedBG} 网络超时 下载失败 重新下载 ${Font}"
