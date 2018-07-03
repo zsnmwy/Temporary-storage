@@ -114,8 +114,8 @@ Remove_hosts_log_week() {
 case $1 in
     -d)
         Is_root
-        rm -f /etc/cron.hourly/Add_cron_update_hosts_steamcommunity.sh
-        rm -f /etc/cron.weekly/Remove_hosts_log_week.sh
+        rm -f /etc/cron.hourly/Add_cron_update_hosts_steamcommunity
+        rm -f /etc/cron.weekly/Remove_hosts_log_week
         rm -f /tmp/steamcommunity-hosts.log
         sed -i /steamcommunity/d /etc/hosts
     ;;
